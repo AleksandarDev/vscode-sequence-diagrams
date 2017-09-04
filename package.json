@@ -11,14 +11,26 @@
         "Other"
     ],
     "activationEvents": [
-        "onCommand:extension.sayHello"
+        "onCommand:extension.sayHello",
+        "onLanguage:sequencediagram"
     ],
     "main": "./out/src/extension",
     "contributes": {
         "commands": [{
             "command": "extension.sayHello",
             "title": "Hello World"
-        }]
+        }],
+        "languages": [
+            {
+                "id": "sequencediagram",
+                "aliases": [
+                    "Sequence Diagram"
+                ],
+                "extensions": [
+                    ".seqdiag"
+                ]
+            }
+        ]
     },
     "scripts": {
         "vscode:prepublish": "npm run compile",
