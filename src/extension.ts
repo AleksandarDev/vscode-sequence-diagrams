@@ -9,8 +9,11 @@ import preview from './preview';
 export function activate(context: vscode.ExtensionContext) {
     console.log("vscode-sequence-diagrams is active!")
 
+    // Retrieve the extension's absolute path
+    let absolutePath = context.asAbsolutePath("src/");
+
     // Open the preview
-    let peviewInstance = new preview();
+    let peviewInstance = new preview(absolutePath);
     peviewInstance.present();
 
     // The command has been defined in the package.json file
