@@ -8,6 +8,14 @@ export default class preview {
 
     constructor(extensionSourceRoot: string) {
         this.extensionSourceRoot = extensionSourceRoot;
+        
+        // TODO: Dispose subscription
+        // TODO: Subscribe to textEditorOpen
+        // TODO: Open the preview (if not present)
+
+        // TODO: Dispose subscription
+        // TODO: Subscribe to textEditorOpen
+        // TODO: Close the preview
     }
 
     public present(): Thenable<any> {
@@ -29,7 +37,7 @@ export default class preview {
     }
 
     static constructPreviewUri(fileName: string): vscode.Uri {
-        return vscode.Uri.parse(previewContentProvider.scheme + "://vscode-sequence-diagrams/diagrampreview");
+        return vscode.Uri.parse(previewContentProvider.scheme + "://vscode-sequence-diagrams/" + preview.getName(fileName) + " Preview");
     }
 
     static getName(path: string): string {
