@@ -1,9 +1,9 @@
 {
-    "name": "vscode-sequence-diagrams",
+    "name": "VSCode Preview Sequence Diagrams",
     "displayName": "vscode-sequence-diagrams",
     "description": "Generates ULM sequence diagrams from simple text",
-    "version": "0.0.1",
-    "publisher": "aleksandardev",
+    "version": "0.1.0",
+    "publisher": "AleksandarDev",
     "engines": {
         "vscode": "^1.15.0"
     },
@@ -11,14 +11,14 @@
         "Other"
     ],
     "activationEvents": [
-        "onCommand:extension.sayHello",
+        "onCommand:extension.showsequencediagrampreview",
         "onLanguage:sequencediagram"
     ],
     "main": "./out/src/extension",
     "contributes": {
         "commands": [{
-            "command": "extension.sayHello",
-            "title": "Hello World"
+            "command": "extension.showsequencediagrampreview",
+            "title": "Show Sequence Diagram Preview"
         }],
         "languages": [
             {

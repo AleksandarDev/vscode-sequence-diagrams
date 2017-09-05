@@ -1,4 +1,5 @@
 import * as vscode from 'vscode';
+import logger from './logger';
 
 export default class previewContentProvider implements vscode.TextDocumentContentProvider {
     static scheme = "vscode-sequence-diagrams";
@@ -6,36 +7,25 @@ export default class previewContentProvider implements vscode.TextDocumentConten
     private _onDidChange = new vscode.EventEmitter<vscode.Uri>();
     private previewUri: vscode.Uri;
     private debounceFileChanged: NodeJS.Timer;
+    private previewDocument: vscode.TextDocument;
 
     constructor(extensionSourceRoot: string, previewUri: vscode.Uri) {
         this.extensionSourceRoot = extensionSourceRoot;
         this.previewUri = previewUri;
-
-        // TODO: Clear subscription
-        vscode.window.onDidChangeActiveTextEditor((e: vscode.TextEditor) => {
-            // Ignore if changed editor's document isn't the active one
-            if (e === undefined || e.document !== vscode.window.activeTextEditor.document)
-                return;
-
-            this.updateDocument();
-        });
-
-        // TODO: Clear subscription
-        vscode.workspace.onDidChangeTextDocument((e: vscode.TextDocumentChangeEvent) => {
-            // Ignore if change was made in non-active document
-            if (vscode.window.activeTextEditor === undefined || 
-                e.document !== vscode.window.activeTextEditor.document) 
-                return;
-
-            this.updateDocument();
-        });
     }
 
     get onDidChange(): vscode.Event<vscode.Uri> {
         return this._onDidChange.event;
     }
 
-    private updateDocument() {
+    public refreshDocument(previewDocument: vscode.TextDocument) {
+        if (previewDocument === undefined ||
+            previewDocument.isClosed)
+            return;
+
+        // Assign new preview document
+        this.previewDocument = previewDocument;
+
         // Cancel previous timeout
         if (this.debounceFileChanged !== undefined)
         {
@@ -45,8 +35,8 @@ export default class previewContentProvider implements vscode.TextDocumentConten
 
         // Start new timeout
         this.debounceFileChanged = setTimeout(() => {
-            console.log(new Date());
-            console.log("Fire!");
+            logger.info("Diagram update requested.");
+            
             this._onDidChange.fire(this.previewUri);
         }, 450);
     }
@@ -57,9 +47,8 @@ export default class previewContentProvider implements vscode.TextDocumentConten
 
     private createContent(): string {
         // Ignore if active document isn't available
-        if (vscode.window.activeTextEditor === undefined ||
-            vscode.window.activeTextEditor.document === undefined)
-            return "";
+        if (this.previewDocument === undefined)
+            return "Not a sequence diagram document.</br>Sequence diagram document needs to have .seqdiag extension.";
 
         // Include scripts
         let includeScripts: string = "";
@@ -67,16 +56,37 @@ export default class previewContentProvider implements vscode.TextDocumentConten
             includeScripts += `<script src="${includePath}"></script>`;
         });
 
+        let svgStyle = `
+            body.vscode-dark svg line, svg path {
+                stroke: #ababab;
+            }
+
+            body.vscode-dark svg .signal line, body.vscode-dark svg .signal path,
+            body.vscode-dark svg .title rect, body.vscode-dark svg .title path,
+            body.vscode-dark svg .actor rect, body.vscode-dark svg .actor path {
+                fill: none;
+                stroke: #ababab;
+            }
+
+            body.vscode-dark svg .title text,
+            body.vscode-dark svg .signal text,
+            body.vscode-dark svg .actor text {
+                fill: #dedede;
+            }`;
+
         // Generate document
         var content = `
             <style>
-                body { margin: 0; background-color: white; color: #333; }
+                body { margin: 0; }                
+                
+                ${svgStyle}
+
             </style>
             <body>
                 <div id="diagram"></div>
                 ${includeScripts}
                 <script>
-                    var diagram = Diagram.parse("${vscode.window.activeTextEditor.document.getText().replace(/[\r?\n]/g, '\\n')}");
+                    var diagram = Diagram.parse("${this.previewDocument.getText().replace(/[\r?\n]/g, '\\n')}");
                     diagram.drawSVG("diagram", {theme: 'simple'});
                 </script>
             </body>`;
@@ -90,7 +100,7 @@ export default class previewContentProvider implements vscode.TextDocumentConten
             this.extensionSourceRoot + "deps/js-sequence-diagrams/snap.svg-min.js",
             this.extensionSourceRoot + "deps/js-sequence-diagrams/underscore-min.js",
             this.extensionSourceRoot + "deps/js-sequence-diagrams/webfont.js",
-            this.extensionSourceRoot + "deps/js-sequence-diagrams/sequence-diagram-min.js"
+            this.extensionSourceRoot + "deps/js-sequence-diagrams/sequence-diagram-snap.js"
         ];
     }
 }
