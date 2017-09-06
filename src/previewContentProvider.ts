@@ -12,6 +12,8 @@ export default class previewContentProvider implements vscode.TextDocumentConten
     constructor(extensionSourceRoot: string, previewUri: vscode.Uri) {
         this.extensionSourceRoot = extensionSourceRoot;
         this.previewUri = previewUri;
+
+        logger.info(this.extensionSourceRoot);
     }
 
     get onDidChange(): vscode.Event<vscode.Uri> {
@@ -63,19 +65,22 @@ export default class previewContentProvider implements vscode.TextDocumentConten
 
             body.vscode-dark svg .signal line, body.vscode-dark svg .signal path,
             body.vscode-dark svg .title rect, body.vscode-dark svg .title path,
-            body.vscode-dark svg .actor rect, body.vscode-dark svg .actor path {
+            body.vscode-dark svg .actor rect, body.vscode-dark svg .actor path,
+            body.vscode-dark svg .note rect, body.vscode-dark svg .note path {
                 fill: none;
                 stroke: #ababab;
             }
 
             body.vscode-dark svg .title text,
             body.vscode-dark svg .signal text,
+            body.vscode-dark svg .note text,
             body.vscode-dark svg .actor text {
                 fill: #dedede;
             }`;
 
         // Generate document
         var content = `
+            <link href='${this.extensionSourceRoot + "deps/js-sequence-diagrams/sequence-diagram.css"}' rel='stylesheet' />
             <style>
                 body { margin: 0; }                
                 
@@ -86,8 +91,8 @@ export default class previewContentProvider implements vscode.TextDocumentConten
                 <div id="diagram"></div>
                 ${includeScripts}
                 <script>
-                    var diagram = Diagram.parse("${this.previewDocument.getText().replace(/[\r?\n]/g, '\\n')}");
-                    diagram.drawSVG("diagram", {theme: 'simple'});
+                    var diagram = Diagram.parse("${this.previewDocument.getText().replace(/\\/g, '\\\\').replace(/[\r?\n]/g, '\\n')}");
+                    diagram.drawSVG("diagram", {theme: 'snapHand'});
                 </script>
             </body>`;
 

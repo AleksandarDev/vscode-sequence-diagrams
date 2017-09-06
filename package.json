@@ -1,9 +1,25 @@
 {
-    "name": "VSCode Preview Sequence Diagrams",
-    "displayName": "vscode-sequence-diagrams",
-    "description": "Generates ULM sequence diagrams from simple text",
+    "name": "vscode-sequence-diagrams",
+    "displayName": "VSCode Sequence Diagrams",
+    "description": "Generates UML sequence diagrams from simple text",
     "version": "0.1.0",
     "publisher": "AleksandarDev",
+    "keywords": [
+        "uml", "sequence", "diagram", "preview", "code"
+    ],
+    "icon": "Icon.png",
+    "preview": true,
+    "author": {
+        "name": "Aleksandar Toplek",
+        "url": "https://github.com/AleksandarDev"
+    },
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/AleksandarDev/vscode-sequence-diagrams"
+    },
+    "bugs": {
+        "url": "https://github.com/AleksandarDev/vscode-sequence-diagrams/issues"
+    },
     "engines": {
         "vscode": "^1.15.0"
     },
