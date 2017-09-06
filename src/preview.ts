@@ -6,10 +6,14 @@ export default class preview {
     private uri: vscode.Uri;
     private provider: previewContentProvider;
     private extensionSourceRoot: string;
+    private diagramStyle: string;
 
     constructor(extensionSourceRoot: string) {
         this.extensionSourceRoot = extensionSourceRoot;
         
+        // Read style configuration 
+        this.diagramStyle = vscode.workspace.getConfiguration("sequencediagrams").get("diagram.style", "hand");
+
         // TODO: Clear subscription
         vscode.workspace.onDidChangeTextDocument((e: vscode.TextDocumentChangeEvent) => {
             // Ignore if change was made in non-active document
@@ -53,6 +57,7 @@ export default class preview {
 
         // Instantiate preview provider and assign scheme
         this.provider = new previewContentProvider(this.extensionSourceRoot, this.uri);
+        this.provider.diagramStyle = this.diagramStyle;
 
         // TODO: Dispose registration
         let registration = vscode.workspace.registerTextDocumentContentProvider(previewContentProvider.scheme, this.provider);

@@ -3,6 +3,7 @@ import logger from './logger';
 
 export default class previewContentProvider implements vscode.TextDocumentContentProvider {
     static scheme = "vscode-sequence-diagrams";
+    public diagramStyle: string;    
     private extensionSourceRoot: string;
     private _onDidChange = new vscode.EventEmitter<vscode.Uri>();
     private previewUri: vscode.Uri;
@@ -92,7 +93,7 @@ export default class previewContentProvider implements vscode.TextDocumentConten
                 ${includeScripts}
                 <script>
                     var diagram = Diagram.parse("${this.previewDocument.getText().replace(/\\/g, '\\\\').replace(/[\r?\n]/g, '\\n')}");
-                    diagram.drawSVG("diagram", {theme: 'snapHand'});
+                    diagram.drawSVG("diagram", {theme: '${this.diagramStyle}'});
                 </script>
             </body>`;
 

@@ -46,7 +46,21 @@
                     ".seqdiag"
                 ]
             }
-        ]
+        ],
+        "configuration": {
+            "title": "Sequance Diagram configuration",
+            "type": "object",
+            "properties": {
+                "sequencediagrams.diagram.style": {
+                    "enum": [
+                        "hand",
+                        "simple"
+                    ],
+                    "default": "hand",
+                    "description": "The diagram style. Select between `hand` for hand drawn diagram or `simple` for diagram with simple straight lines."
+                }
+            }
+        }
     },
     "scripts": {
         "vscode:prepublish": "npm run compile",
