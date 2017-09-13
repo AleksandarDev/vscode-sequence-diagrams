@@ -14,6 +14,9 @@ export function activate(context: vscode.ExtensionContext) {
 
     // Retrieve the extension's absolute path
     let absolutePath = context.asAbsolutePath("out/src/");
+    if (absolutePath[0] === '/')
+        absolutePath = "file://" + absolutePath;
+    else absolutePath = "file:///" + absolutePath;
 
     // Open the preview
     previewInstance = new preview(absolutePath);

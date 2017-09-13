@@ -92,7 +92,7 @@ export default class previewContentProvider implements vscode.TextDocumentConten
                 <div id="diagram"></div>
                 ${includeScripts}
                 <script>
-                    var diagram = Diagram.parse("${this.previewDocument.getText().replace(/\\/g, '\\\\').replace(/[\r?\n]/g, '\\n')}");
+                    var diagram = Diagram.parse("${this.previewDocument.getText().replace(/\\/g, '\\\\').replace(/[\r\n]/g, '\\n')}");
                     diagram.drawSVG("diagram", {theme: '${this.diagramStyle}'});
                 </script>
             </body>`;
