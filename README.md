@@ -5,7 +5,7 @@ _vscode-sequence-diagrams_
 
 When you open `.seqdiag` file in Visual Studio Code, preview tab will open automatically. 
 
-If you wish to reopen the preview tab, press `CTRL+SHIFT+P` to open Command Palette and execute `Show Sequence Diagram Preview` command.
+If you wish to reopen the preview tab, press `CTRL+SHIFT+P` or `F1` to open Command Palette and execute `Show Sequence Diagram Preview` command.
 
 See [js-sequence-diagrams](https://bramp.github.io/js-sequence-diagrams/) for syntax details.
 
