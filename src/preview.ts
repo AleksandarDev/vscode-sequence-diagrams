@@ -3,85 +3,48 @@ import previewContentProvider from './previewContentProvider';
 import logger from './logger';
 
 export default class preview {
-    private uri: vscode.Uri;
     private provider: previewContentProvider;
     private extensionSourceRoot: string;
-    private diagramStyle: string;
+    private exContext: vscode.ExtensionContext;
 
-    constructor(extensionSourceRoot: string) {
+    constructor(context: vscode.ExtensionContext, extensionSourceRoot: string) {
+        this.exContext = context;
         this.extensionSourceRoot = extensionSourceRoot;
-        
-        // Read style configuration 
-        this.diagramStyle = vscode.workspace.getConfiguration("sequencediagrams").get("diagram.style", "hand");
 
-        // TODO: Clear subscription
-        vscode.workspace.onDidChangeTextDocument((e: vscode.TextDocumentChangeEvent) => {
-            // Ignore if change was made in non-active document
-            if (e === undefined || 
-                vscode.window.activeTextEditor === undefined || 
-                e.document !== vscode.window.activeTextEditor.document) 
-                return;
+        // Attach to events
+        var disposeOnDidChangeTextDocument = vscode.workspace.onDidChangeTextDocument(this.checkRefreshDocument.bind(this));
+        var disposeOnDidChangeActiveTextEditor = vscode.window.onDidChangeActiveTextEditor(this.checkRefreshDocument.bind(this));
 
-                // Ignore if document is not diagram document
-            if (!preview.isDocumentDiagram(e.document)) 
-                return;
+        this.exContext.subscriptions.push(disposeOnDidChangeTextDocument);
+        this.exContext.subscriptions.push(disposeOnDidChangeActiveTextEditor);
+    }
 
-            this.provider.refreshDocument(e.document);
-        });
+    public async present() {
+        // Instantiate preview provider and assign scheme
+        this.provider = new previewContentProvider(this.exContext, this.extensionSourceRoot);
+        this.provider.diagramStyle = vscode.workspace.getConfiguration("sequencediagrams").get("diagram.style", "simple");
+        this.provider.present();
 
-        // TODO: Clear subscription
-        vscode.window.onDidChangeActiveTextEditor((e: vscode.TextEditor) => {
-            // Ignore if changed editor's document isn't the active one
-            if (e === undefined || 
-                vscode.window.activeTextEditor === undefined || 
-                e.document !== vscode.window.activeTextEditor.document)
-                return;
+        this.checkRefreshDocument(vscode.window.activeTextEditor);
+    }
 
-            // Ignore if document is not diagram document
-            if (!preview.isDocumentDiagram(e.document)) 
-                return;
+    private checkRefreshDocument(editor: vscode.TextEditor | vscode.TextDocumentChangeEvent) {
+        // Ignore if changed editor's document isn't the active one
+        // or document is not diagram document
+        if (editor === undefined || 
+            vscode.window.activeTextEditor === undefined || 
+            editor.document == null ||
+            editor.document.isClosed ||
+            editor.document !== vscode.window.activeTextEditor.document ||
+            !preview.isDocumentDiagram(editor.document)) {
+            logger.info("Check refresh document rejected.");
+            return;
+        }
 
-            this.provider.refreshDocument(e.document);
-        });
+        this.provider.refreshDocument(editor.document);
     }
 
     private static isDocumentDiagram(doc: vscode.TextDocument) {
         return doc.languageId === "sequencediagram";
-    }
-
-    public present(): Thenable<any> {
-        logger.info("Present requested.");
-
-        // Retrieve script name and construct preview URI
-        this.uri = preview.constructPreviewUri();        
-
-        // Instantiate preview provider and assign scheme
-        this.provider = new previewContentProvider(this.extensionSourceRoot, this.uri);
-        this.provider.diagramStyle = this.diagramStyle;
-
-        // TODO: Dispose registration
-        let registration = vscode.workspace.registerTextDocumentContentProvider(previewContentProvider.scheme, this.provider);
-
-        // Show the preview
-        return vscode.commands
-            .executeCommand('vscode.previewHtml', this.uri, vscode.ViewColumn.Two)
-            .then((success) => {
-                // Refresh active document (if available)
-                if (vscode.window.activeTextEditor !== undefined &&
-                    vscode.window.activeTextEditor.document !== undefined &&
-                    preview.isDocumentDiagram(vscode.window.activeTextEditor.document))
-                    this.provider.refreshDocument(vscode.window.activeTextEditor.document);
-            }, (reason) => {
-                vscode.window.showErrorMessage(reason);
-            });
-    }
-
-    static constructPreviewUri(): vscode.Uri {
-        return vscode.Uri.parse(previewContentProvider.scheme + "://vscode-sequence-diagrams/Sequence Diagram Preview");
-    }
-
-    static getName(path: string): string {
-        let scriptName = path.split('\\').pop().split('/').pop();
-        return scriptName;
     }
 }

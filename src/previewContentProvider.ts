@@ -1,65 +1,136 @@
 import * as vscode from 'vscode';
+import * as svg2png from 'svg2png';
+import * as utils from './utils';
 import logger from './logger';
+import { writeFileSync } from 'fs';
 
-export default class previewContentProvider implements vscode.TextDocumentContentProvider {
-    static scheme = "vscode-sequence-diagrams";
-    public diagramStyle: string;    
+export default class previewContentProvider {
+    public diagramStyle: string;
+    private currentPanel: vscode.WebviewPanel;
     private extensionSourceRoot: string;
-    private _onDidChange = new vscode.EventEmitter<vscode.Uri>();
-    private previewUri: vscode.Uri;
-    private debounceFileChanged: NodeJS.Timer;
     private previewDocument: vscode.TextDocument;
+    private throttledRefreshDocument;
 
-    constructor(extensionSourceRoot: string, previewUri: vscode.Uri) {
+    constructor(context: vscode.ExtensionContext, extensionSourceRoot: string) {
         this.extensionSourceRoot = extensionSourceRoot;
-        this.previewUri = previewUri;
 
-        logger.info(this.extensionSourceRoot);
+        this._receiveMessage = this._receiveMessage.bind(this);
+        this._refreshDocument = this._refreshDocument.bind(this);
+        this._getExportFileName = this._getExportFileName.bind(this);
+
+        this.currentPanel = vscode.window.createWebviewPanel(
+            'sequence-diagram',
+            'Sequence Diagram',
+            vscode.ViewColumn.Two, {
+                enableScripts: true,
+                enableCommandUris: false
+            });
+
+        // Handle messages from the webview
+        this.currentPanel.webview.onDidReceiveMessage(
+            this._receiveMessage,
+            undefined,
+            context.subscriptions);
+
+        this.currentPanel.onDidDispose(
+            () => { this.currentPanel = undefined; },
+            undefined,
+            context.subscriptions);
+
+        this.throttledRefreshDocument = utils.throttle(this._refreshDocument, 200);
     }
 
-    get onDidChange(): vscode.Event<vscode.Uri> {
-        return this._onDidChange.event;
+    private async _receiveMessage(message) {
+        if (message == null || message.command == null) return;
+
+        let extension;
+        try {
+            let exportFileName;
+            switch (message.command) {
+                case 'export-svg':
+                    extension = "svg";
+                    exportFileName = this._getExportFileName(extension);
+                    writeFileSync(exportFileName, Buffer.from(message.data, 'base64').toString('binary'));
+                    break;
+                case 'export-png':
+                    extension = "png";
+                    exportFileName = this._getExportFileName(extension);
+                    const pngBuffer = await svg2png(Buffer.from(message.data, 'base64'));
+                    writeFileSync(exportFileName, pngBuffer);
+                    break;
+            }
+            vscode.window.showInformationMessage("Sequence Diagrams - " + extension.toUpperCase() + " saved to " + exportFileName);
+        } catch(error) {
+            logger.error(error);
+            vscode.window.showErrorMessage("Sequence Diagrams - Failed to save " + extension.toUpperCase());
+        }
+
+        this.currentPanel.webview.postMessage({
+            command: 'export-done',
+        });
+    }
+
+    private _getExportFileName(extension: string) : string {
+        const fileName = this.previewDocument.fileName;
+        const exportFileName = (fileName.substr(0, fileName.lastIndexOf('.')) || fileName) + "." + extension;
+        return exportFileName;
+    }
+
+    public present() {
+        this.setWebViewContent();
     }
 
     public refreshDocument(previewDocument: vscode.TextDocument) {
-        if (previewDocument === undefined ||
-            previewDocument.isClosed)
-            return;
-
-        // Assign new preview document
         this.previewDocument = previewDocument;
-
-        // Cancel previous timeout
-        if (this.debounceFileChanged !== undefined)
-        {
-            clearTimeout(this.debounceFileChanged);
-            this.debounceFileChanged = undefined;    
-        }
-
-        // Start new timeout
-        this.debounceFileChanged = setTimeout(() => {
-            logger.info("Diagram update requested.");
-            
-            this._onDidChange.fire(this.previewUri);
-        }, 450);
+        this.throttledRefreshDocument();
     }
 
-    public provideTextDocumentContent(uri: vscode.Uri): string {
-        return this.createContent();
+    private _refreshDocument() {
+        this.currentPanel.webview.postMessage({
+            command: 'set-source',
+            source: this.previewDocument.getText()
+        });
+    }
+
+    private setWebViewContent() {
+        if (this.currentPanel == null) return;
+        this.currentPanel.webview.html = this.createContent();
     }
 
     private createContent(): string {
-        // Ignore if active document isn't available
-        if (this.previewDocument === undefined)
-            return "Not a sequence diagram document.</br>Sequence diagram document needs to have .seqdiag extension.";
+        const svgStyle = `
+            body { margin: 0; }
 
-        // Include scripts
-        let includeScripts: string = "";
-        this.getScriptIncludes().forEach(includePath => {
-            includeScripts += `<script src="${includePath}"></script>`;
-        });
+            .status-panel {
+                background-color: rgba(128, 128, 128, 0.1);
+                padding: 4px;
+                position: fixed;
+                bottom: 0;
+                left: 0;
+                right: 0;
+                text-align: right;
+            }
 
-        let svgStyle = `
+            .export-btn {
+                cursor: pointer;
+                border: 1px solid #aaa;
+                padding: 4px 8px;
+                color: #333333;
+                display: inline-block;
+            }
+            body.vscode-dark .export-btn {
+                color: #dedede;
+            }
+
+            .export-btn.disabled {
+                cursor: default;
+                background-color: rgba(128, 128, 128, 0.1);
+                color: #666666;
+            }
+            body.vscode-dark .export-btn.disabled {
+                color: #aaaaaa;
+            }
+
             body.vscode-dark svg line, svg path {
                 stroke: #ababab;
             }
@@ -79,34 +150,23 @@ export default class previewContentProvider implements vscode.TextDocumentConten
                 fill: #dedede;
             }`;
 
-        // Generate document
-        var content = `
+        return `
             <link href='${this.extensionSourceRoot + "deps/js-sequence-diagrams/sequence-diagram.css"}' rel='stylesheet' />
-            <style>
-                body { margin: 0; }                
-                
-                ${svgStyle}
-
-            </style>
+            <style>${svgStyle}</style>
             <body>
                 <div id="diagram"></div>
-                ${includeScripts}
+                <div class='status-panel'>
+                    <div class='export-btn link-download-svg'>Export SVG</div>
+                    <div class='export-btn link-download-png'>Export PNG</div>
+                </div>
                 <script>
-                    var diagram = Diagram.parse("${this.previewDocument.getText().replace(/\\/g, '\\\\').replace(/[\r\n]/g, '\\n')}");
-                    diagram.drawSVG("diagram", {theme: '${this.diagramStyle}'});
+                    window.diagramStyle = "${this.diagramStyle}";
                 </script>
+                <script src="${this.extensionSourceRoot + "deps/js-sequence-diagrams/snap.svg-min.js"}"></script>
+                <script src="${this.extensionSourceRoot + "deps/js-sequence-diagrams/underscore-min.js"}"></script>
+                <script src="${this.extensionSourceRoot + "deps/js-sequence-diagrams/webfont.js"}"></script>
+                <script src="${this.extensionSourceRoot + "deps/js-sequence-diagrams/sequence-diagram-snap-min.js"}"></script>
+                <script src="${this.extensionSourceRoot + "contentscript.js"}"></script>
             </body>`;
-
-        return content;
-    }
-
-    private getScriptIncludes(): string[] {
-        return [ 
-            // TODO: Place scripts here
-            this.extensionSourceRoot + "deps/js-sequence-diagrams/snap.svg-min.js",
-            this.extensionSourceRoot + "deps/js-sequence-diagrams/underscore-min.js",
-            this.extensionSourceRoot + "deps/js-sequence-diagrams/webfont.js",
-            this.extensionSourceRoot + "deps/js-sequence-diagrams/sequence-diagram-snap.js"
-        ];
     }
 }

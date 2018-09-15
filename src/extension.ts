@@ -7,29 +7,25 @@ import logger from './logger';
 
 var previewInstance: preview;
 
-// this method is called when your extension is activated
-// your extension is activated the very first time the command is executed
 export function activate(context: vscode.ExtensionContext) {
     logger.info("Active!")
 
     // Retrieve the extension's absolute path
-    let absolutePath = context.asAbsolutePath("out/src/");
-    if (absolutePath[0] === '/')
-        absolutePath = "file://" + absolutePath;
-    else absolutePath = "file:///" + absolutePath;
+    let absolutePath = "vscode-resource:" + context.asAbsolutePath("out/src/");
+    logger.info("Extension root: " + absolutePath);
 
     // Open the preview
-    previewInstance = new preview(absolutePath);
+    previewInstance = new preview(context, absolutePath);
     previewInstance.present();
 
-    // The command has been defined in the package.json file
-    // Now provide the implementation of the command with  registerCommand
-    // The commandId parameter must match the command field in package.json
-    let disposable = vscode.commands.registerCommand('extension.showsequencediagrampreview', () => {
-        previewInstance.present();
-    });
+    // Register commands
+    const disposableCommands = [
+        vscode.commands.registerCommand('extension.showsequencediagrampreview', () => { previewInstance.present(); }),
+    ];
 
-    context.subscriptions.push(disposable);
+    for (let disposableCommandIndex = 0; disposableCommandIndex < disposableCommands.length; disposableCommandIndex++) {
+        context.subscriptions.push(disposableCommands[disposableCommandIndex]);
+    }
 }
 
 // this method is called when your extension is deactivated

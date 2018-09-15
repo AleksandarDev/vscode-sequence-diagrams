@@ -2,7 +2,7 @@
     "name": "vscode-sequence-diagrams",
     "displayName": "VSCode Sequence Diagrams",
     "description": "Generates UML sequence diagrams from simple text",
-    "version": "0.2.1",
+    "version": "0.3.0",
     "publisher": "AleksandarDev",
     "keywords": [
         "uml",
@@ -12,6 +12,7 @@
         "code"
     ],
     "icon": "Icon.png",
+    "license": "MIT",
     "preview": true,
     "author": {
         "name": "Aleksandar Toplek",
@@ -25,7 +26,7 @@
         "url": "https://github.com/AleksandarDev/vscode-sequence-diagrams/issues"
     },
     "engines": {
-        "vscode": "^1.15.0"
+        "vscode": "^1.27.0"
     },
     "categories": [
         "Other"
@@ -72,14 +73,15 @@
         "vscode:prepublish": "npm run compile",
         "compile": "tsc -p ./",
         "watch": "tsc -watch -p ./",
-        "postinstall": "node ./node_modules/vscode/bin/install",
-        "test": "npm run compile && node ./node_modules/vscode/bin/test"
+        "postinstall": "node ./node_modules/vscode/bin/install"
     },
     "devDependencies": {
-        "typescript": "^2.5.2",
-        "vscode": "^1.1.5",
-        "mocha": "^3.5.0",
         "@types/node": "^8.0.26",
-        "@types/mocha": "^2.2.42"
+        "typescript": "^2.5.2",
+        "vscode": "^1.1.5"
+    },
+    "dependencies": {
+        "@types/svg2png": "^4.1.0",
+        "svg2png": "^4.1.1"
     }
 }

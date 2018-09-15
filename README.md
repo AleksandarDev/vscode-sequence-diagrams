@@ -15,21 +15,4 @@ See [js-sequence-diagrams](https://bramp.github.io/js-sequence-diagrams/) for sy
 |----------------------------------|------------------------------------------|
 | `sequencediagrams.diagram.style` | The diagram style. Select between `hand` for hand drawn diagram or `simple` for diagram with simple straight lines. |
 
-## Changelog
-
-### v0.2.1 Preview (2017-09-13)
-- Fixed: Diagram preview is blank on Unix systems
-
-### v0.2.0 Preview (2017-09-07)
-- New: Added diagram style option to configuration 
-
-![v0.2.0 Perview Screenshot](images/Demo0.2.0.png)
-
-### v0.1.0 Preview (2017-09-06)
-- New: Preview
-- New: Command "Show Sequence Diagram Preview"
-- New: `.seqdiag` extensions support
-
-![v0.1.0 Preview Screenshot](images/Demo0.1.0.png)
-
 **Enjoy!**
