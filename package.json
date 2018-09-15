@@ -2,7 +2,7 @@
     "name": "vscode-sequence-diagrams",
     "displayName": "VSCode Sequence Diagrams",
     "description": "Generates UML sequence diagrams from simple text",
-    "version": "0.3.0",
+    "version": "0.3.1",
     "publisher": "AleksandarDev",
     "keywords": [
         "uml",

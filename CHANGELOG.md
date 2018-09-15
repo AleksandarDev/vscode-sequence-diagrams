@@ -3,6 +3,10 @@ All notable changes to the "vscode-sequence-diagrams" extension will be document
 
 Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how to structure this file.
 
+## [0.3.1] - 2018-09-15
+### Fixed
+- Being unable to export multiple times if fixed
+
 ## [0.3.0] - 2018-09-15
 ### Added
 - Added export to SVG
