@@ -11,9 +11,11 @@ export default class preview {
         this.exContext = context;
         this.extensionSourceRoot = extensionSourceRoot;
 
+        this.checkRefreshDocument = this.checkRefreshDocument.bind(this)
+
         // Attach to events
-        var disposeOnDidChangeTextDocument = vscode.workspace.onDidChangeTextDocument(this.checkRefreshDocument.bind(this));
-        var disposeOnDidChangeActiveTextEditor = vscode.window.onDidChangeActiveTextEditor(this.checkRefreshDocument.bind(this));
+        var disposeOnDidChangeTextDocument = vscode.workspace.onDidChangeTextDocument(this.checkRefreshDocument);
+        var disposeOnDidChangeActiveTextEditor = vscode.window.onDidChangeActiveTextEditor(this.checkRefreshDocument);
 
         this.exContext.subscriptions.push(disposeOnDidChangeTextDocument);
         this.exContext.subscriptions.push(disposeOnDidChangeActiveTextEditor);
@@ -37,9 +39,12 @@ export default class preview {
             editor.document.isClosed ||
             editor.document !== vscode.window.activeTextEditor.document ||
             !preview.isDocumentDiagram(editor.document)) {
+
             logger.info("Check refresh document rejected.");
             return;
         }
+
+        logger.info("Check refresh document accepted.");
 
         this.provider.refreshDocument(editor.document);
     }

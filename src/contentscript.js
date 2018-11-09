@@ -36,8 +36,9 @@ try {
             return;
         disableExportButtons();
         const data = getDiagramSvgBase64();
-        const vscode = acquireVsCodeApi();
-        vscode.postMessage({
+        if (window.vscode == null)
+            window.vscode = acquireVsCodeApi();
+        window.vscode.postMessage({
             command: 'export-png',
             data: data
         });
