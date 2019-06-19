@@ -55,7 +55,7 @@
             }
         ],
         "configuration": {
-            "title": "Sequance Diagram configuration",
+            "title": "Sequence Diagram configuration",
             "type": "object",
             "properties": {
                 "sequencediagrams.diagram.style": {
