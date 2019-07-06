@@ -4,7 +4,7 @@ const exportPngLink = document.querySelector('.link-download-png');
 function getDiagramSvgBase64() {
     var svg = document.getElementById('diagram').children[0];
     var xml = new XMLSerializer().serializeToString(svg);
-    return btoa(xml);
+    return btoa(unescape(encodeURIComponent(xml)));
 }
 
 function disableExportButtons() {
