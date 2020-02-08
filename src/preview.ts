@@ -6,6 +6,7 @@ export default class preview {
     private provider: previewContentProvider;
     private extensionSourceRoot: string;
     private exContext: vscode.ExtensionContext;
+    private previewTrigger: string;
 
     constructor(context: vscode.ExtensionContext, extensionSourceRoot: string) {
         this.exContext = context;
@@ -19,6 +20,9 @@ export default class preview {
 
         this.exContext.subscriptions.push(disposeOnDidChangeTextDocument);
         this.exContext.subscriptions.push(disposeOnDidChangeActiveTextEditor);
+
+        // Retrieve settings
+        this.previewTrigger = vscode.workspace.getConfiguration("sequencediagrams").get("preview.trigger", "onChange");
     }
 
     public async present() {
@@ -41,6 +45,14 @@ export default class preview {
             !preview.isDocumentDiagram(editor.document)) {
 
             logger.info("Check refresh document rejected.");
+            return;
+        }
+        
+        // Check if we onlt need to update preview on save
+        if (this.previewTrigger === "onSave" &&
+            editor.document.isDirty) {
+
+            logger.info("Check refresh document rejected - trigger configured to OnSave.");
             return;
         }
 
