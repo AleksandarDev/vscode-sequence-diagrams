@@ -99,7 +99,7 @@ export default class previewContentProvider {
 
     private setWebViewContent() {
         if (this.currentPanel == null) return;
-        this.currentPanel.webview.html = this.createContent(this.currentPanel)
+        this.currentPanel.webview.html = this.createContent()
     }
 
     private createContent(panel): string {
