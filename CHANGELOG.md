@@ -4,6 +4,12 @@ All notable changes to the "vscode-sequence-diagrams" extension will be document
 
 Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how to structure this file.
 
+## [0.4.1] - 2020-10-22
+
+### Fixed 
+
+- Sequence rendering (Community PR [#24](https://github.com/AleksandarDev/vscode-sequence-diagrams/pull/24)
+
 ## [0.4.0] - 2020-02-08
 
 ### Added

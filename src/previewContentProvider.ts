@@ -8,13 +8,12 @@ import * as path from 'path';
 export default class previewContentProvider {
     public diagramStyle: string;
     private currentPanel: vscode.WebviewPanel;
-    private extensionSourceRoot: string;
     private previewDocument: vscode.TextDocument;
     private throttledRefreshDocument;
+    private extensionPath: string;
 
-    constructor(context: vscode.ExtensionContext, extensionSourceRoot: string) {
+    constructor(context: vscode.ExtensionContext) {
         this.extensionPath = context.extensionPath;
-        this.extensionSourceRoot = extensionSourceRoot;
 
         this._receiveMessage = this._receiveMessage.bind(this);
         this._refreshDocument = this._refreshDocument.bind(this);

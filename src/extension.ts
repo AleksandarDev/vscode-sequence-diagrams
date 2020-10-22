@@ -10,12 +10,8 @@ var previewInstance: preview;
 export function activate(context: vscode.ExtensionContext) {
     logger.info("Active!")
 
-    // Retrieve the extension's absolute path
-    let absolutePath = "vscode-resource:" + context.asAbsolutePath("out/src/");
-    logger.info("Extension root: " + absolutePath);
-
     // Open the preview
-    previewInstance = new preview(context, absolutePath);
+    previewInstance = new preview(context);
     previewInstance.present();
 
     // Register commands

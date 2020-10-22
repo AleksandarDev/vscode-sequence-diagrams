@@ -4,13 +4,11 @@ import logger from './logger';
 
 export default class preview {
     private provider: previewContentProvider;
-    private extensionSourceRoot: string;
     private exContext: vscode.ExtensionContext;
     private previewTrigger: string;
 
-    constructor(context: vscode.ExtensionContext, extensionSourceRoot: string) {
+    constructor(context: vscode.ExtensionContext) {
         this.exContext = context;
-        this.extensionSourceRoot = extensionSourceRoot;
 
         this.checkRefreshDocument = this.checkRefreshDocument.bind(this)
 
@@ -27,7 +25,7 @@ export default class preview {
 
     public async present() {
         // Instantiate preview provider and assign scheme
-        this.provider = new previewContentProvider(this.exContext, this.extensionSourceRoot);
+        this.provider = new previewContentProvider(this.exContext);
         this.provider.diagramStyle = vscode.workspace.getConfiguration("sequencediagrams").get("diagram.style", "simple");
         this.provider.present();
 
