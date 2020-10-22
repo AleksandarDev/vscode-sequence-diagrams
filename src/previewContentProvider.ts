@@ -102,7 +102,7 @@ export default class previewContentProvider {
         this.currentPanel.webview.html = this.createContent()
     }
 
-    private createContent(panel): string {
+    private createContent(): string {
         const svgStyle = `
             body { margin: 0; }
 
