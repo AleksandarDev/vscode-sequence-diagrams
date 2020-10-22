@@ -160,7 +160,6 @@ export default class previewContentProvider {
                 <link href='${this.assetPath("deps/js-sequence-diagrams/sequence-diagram.css")}' rel='stylesheet' />
                 <style>${svgStyle}</style>
                 <body>
-                    <div>Rendered!</div>
                     <div id="diagram"></div>
                     <div class='status-panel'>
                         <div class='export-btn link-download-svg'>Export SVG</div>
