@@ -90,6 +90,7 @@
     },
     "dependencies": {
         "@types/svg2png": "^4.1.0",
-        "svg2png": "^4.1.1"
+        "svg2png": "^4.1.1",
+        "vscode": "^1.1.37"
     }
 }

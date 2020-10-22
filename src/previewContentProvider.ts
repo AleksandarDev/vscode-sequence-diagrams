@@ -3,6 +3,7 @@ import * as svg2png from 'svg2png';
 import * as utils from './utils';
 import logger from './logger';
 import { writeFileSync } from 'fs';
+import * as path from 'path';
 
 export default class previewContentProvider {
     public diagramStyle: string;
@@ -12,6 +13,7 @@ export default class previewContentProvider {
     private throttledRefreshDocument;
 
     constructor(context: vscode.ExtensionContext, extensionSourceRoot: string) {
+        this.extensionPath = context.extensionPath;
         this.extensionSourceRoot = extensionSourceRoot;
 
         this._receiveMessage = this._receiveMessage.bind(this);
@@ -23,7 +25,10 @@ export default class previewContentProvider {
             'Sequence Diagram',
             vscode.ViewColumn.Two, {
                 enableScripts: true,
-                enableCommandUris: false
+                enableCommandUris: false,
+                localResourceRoots: [
+                    vscode.Uri.file(path.join(context.extensionPath, 'src'))
+                ]
             });
 
         // Handle messages from the webview
@@ -94,7 +99,7 @@ export default class previewContentProvider {
 
     private setWebViewContent() {
         if (this.currentPanel == null) return;
-        this.currentPanel.webview.html = this.createContent();
+        this.currentPanel.webview.html = this.createContent()
     }
 
     private createContent(): string {
@@ -151,22 +156,32 @@ export default class previewContentProvider {
             }`;
 
         return `
-            <link href='${this.extensionSourceRoot + "deps/js-sequence-diagrams/sequence-diagram.css"}' rel='stylesheet' />
-            <style>${svgStyle}</style>
-            <body>
-                <div id="diagram"></div>
-                <div class='status-panel'>
-                    <div class='export-btn link-download-svg'>Export SVG</div>
-                    <div class='export-btn link-download-png'>Export PNG</div>
-                </div>
-                <script>
-                    window.diagramStyle = "${this.diagramStyle}";
-                </script>
-                <script src="${this.extensionSourceRoot + "deps/js-sequence-diagrams/snap.svg-min.js"}"></script>
-                <script src="${this.extensionSourceRoot + "deps/js-sequence-diagrams/underscore-min.js"}"></script>
-                <script src="${this.extensionSourceRoot + "deps/js-sequence-diagrams/webfont.js"}"></script>
-                <script src="${this.extensionSourceRoot + "deps/js-sequence-diagrams/sequence-diagram-snap-min.js"}"></script>
-                <script src="${this.extensionSourceRoot + "contentscript.js"}"></script>
-            </body>`;
+            <html>
+                <link href='${this.assetPath("deps/js-sequence-diagrams/sequence-diagram.css")}' rel='stylesheet' />
+                <style>${svgStyle}</style>
+                <body>
+                    <div id="diagram"></div>
+                    <div class='status-panel'>
+                        <div class='export-btn link-download-svg'>Export SVG</div>
+                        <div class='export-btn link-download-png'>Export PNG</div>
+                    </div>
+                    <script>
+                        window.diagramStyle = "${this.diagramStyle}";
+                    </script>
+                    <script src="${this.assetPath("deps/js-sequence-diagrams/snap.svg-min.js")}"></script>
+                    <script src="${this.assetPath("deps/js-sequence-diagrams/underscore-min.js")}"></script>
+                    <script src="${this.assetPath("deps/js-sequence-diagrams/webfont.js")}"></script>
+                    <script src="${this.assetPath("deps/js-sequence-diagrams/sequence-diagram-snap-min.js")}"></script>
+                    <script src="${this.assetPath("contentscript.js")}"></script>
+                </body>
+            </html>`;
+    }
+
+    private assetPath(resourcePath) {
+        return this.currentPanel.webview.asWebviewUri(
+            vscode.Uri.file(
+                path.join(this.extensionPath, 'src', resourcePath)
+            )
+        )
     }
 }
