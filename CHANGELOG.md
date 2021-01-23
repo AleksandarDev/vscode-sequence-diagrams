@@ -4,7 +4,7 @@ All notable changes to the "vscode-sequence-diagrams" extension will be document
 
 Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how to structure this file.
 
-## [0.4.2] - 2021-01-23
+## [0.4.3] - 2021-01-23
 
 ### Fixed 
 

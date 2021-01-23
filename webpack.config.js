@@ -42,7 +42,7 @@ const config = {
     new CopyPlugin({
       patterns: [
         { from: 'src/deps', to: 'deps' },
-        { from: 'src/contentscript.js', to: 'contentscript.js' },
+        { from: 'src/contentscript.js', to: 'contentscript.js' }
       ]
     })
   ]
