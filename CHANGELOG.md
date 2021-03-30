@@ -4,6 +4,12 @@ All notable changes to the "vscode-sequence-diagrams" extension will be document
 
 Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how to structure this file.
 
+## [0.4.4] - 2021-03-30
+
+### Fixed
+
+- Allow loading of resources from workspace root and extension's install directory (Community PR [#29](https://github.com/AleksandarDev/vscode-sequence-diagrams/pull/29) by [Chris Havekost](https://github.com/chrishavekost))
+
 ## [0.4.3] - 2021-01-23
 
 ### Fixed 
