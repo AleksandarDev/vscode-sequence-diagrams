@@ -2,7 +2,7 @@
     "name": "vscode-sequence-diagrams",
     "displayName": "VSCode Sequence Diagrams",
     "description": "Generates UML sequence diagrams from simple text",
-    "version": "0.4.1",
+    "version": "0.4.4",
     "publisher": "AleksandarDev",
     "keywords": [
         "uml",
@@ -81,7 +81,7 @@
         "vscode:prepublish": "webpack --mode production",
         "webpack": "webpack --mode development",
         "webpack-dev": "webpack --mode development --watch",
-        "test-compile": "tsc -p ./"
+        "test-compile": "webpack --mode development"
     },
     "devDependencies": {
         "@types/node": "^10.14.17",
