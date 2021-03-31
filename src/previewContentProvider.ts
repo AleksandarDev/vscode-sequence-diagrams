@@ -26,7 +26,7 @@ export default class previewContentProvider {
                 enableScripts: true,
                 enableCommandUris: false,
                 localResourceRoots: [
-                    vscode.Uri.file(path.join(context.extensionPath, 'src'))
+                    vscode.Uri.joinPath(context.extensionUri, 'dist')
                 ]
             });
 
@@ -179,7 +179,7 @@ export default class previewContentProvider {
     private assetPath(resourcePath) {
         return this.currentPanel.webview.asWebviewUri(
             vscode.Uri.file(
-                path.join(this.extensionPath, 'src', resourcePath)
+                path.join(this.extensionPath, 'dist', resourcePath)
             )
         )
     }
