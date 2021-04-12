@@ -25,12 +25,9 @@ export default class previewContentProvider {
             vscode.ViewColumn.Two, {
                 enableScripts: true,
                 enableCommandUris: false,
-                // Root paths from which the webview can load local (filesystem) resources using uris from asWebviewUri
-                // Default to the root folders of the current workspace plus the extension's install directory.
-                // Pass in an empty array to disallow access to any local resources.
-                // localResourceRoots: [
-                //     vscode.Uri.file(path.join(context.extensionPath, 'src'))
-                // ]
+                localResourceRoots: [
+                    vscode.Uri.joinPath(context.extensionUri, 'dist')
+                ]
             });
 
         // Handle messages from the webview
@@ -182,7 +179,7 @@ export default class previewContentProvider {
     private assetPath(resourcePath) {
         return this.currentPanel.webview.asWebviewUri(
             vscode.Uri.file(
-                path.join(this.extensionPath, 'src', resourcePath)
+                path.join(this.extensionPath, 'dist', resourcePath)
             )
         )
     }
