@@ -4,6 +4,10 @@ All notable changes to the "vscode-sequence-diagrams" extension will be document
 
 Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how to structure this file.
 
+## [0.4.6] - 2021-04-12
+
+- Updated npm packages for securty #30, #31
+
 ## [0.4.5] - 2021-04-12
 
 - Fix assetPath function for production package (Community PR [#32](https://github.com/AleksandarDev/vscode-sequence-diagrams/pull/32) by [Joe Burns](https://github.com/JoeMcB))
